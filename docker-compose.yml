@@ -3,6 +3,7 @@ version: '3'
 networks:
   prodnetwork:
     driver: bridge
+    external: true
 #    ipam:
 #      driver: default
 #      config:
@@ -227,7 +228,7 @@ services:
 ##    depends_on:
 ##      - prometheus
 #####  end block prometheus and grafana
-#  dns:
+  dns:
     image: phensley/docker-dns
     hostname: dns
     domainname: dns.local
