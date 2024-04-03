@@ -1,0 +1,231 @@
+version: '3'
+
+networks:
+  prodnetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.80.0/24
+          ip_range: 192.168.80.48/28
+          gateway: 192.168.80.1
+    internal: true
+
+
+#networks:
+#  prodnetwork:
+#    name: prodnetwork
+#    driver: macvlan
+#    driver_opts:
+#      parent: wlp58s0
+#    ipam:
+#      config:
+#        - subnet: "192.168.81.0/24"
+#          ip_range: "192.168.81.64/27"
+#          gateway: "192.168.81.1"
+
+
+#networks:
+#  prodnetwork:
+#    name: prodnetwork
+#    driver: ipvlan
+#    driver_opts:
+#      parent: wlp58s0
+#      com.docker.network.bridge.name: prodnetwork
+#      ipvlan-mode: l3
+#    ipam:
+#      config:
+#        - subnet: "192.168.80.0/24"
+#          ip_range: "192.168.80.64/27"
+#          gateway: "192.168.80.1"
+
+
+
+volumes:
+  nexus-data:
+  jenkins-data:
+  prom_data:
+
+services:
+  nexus:
+    hostname: nexus
+    domainname: nexus.local
+    build: ./nexus
+    restart: always
+    ports:
+     # - "18081:8081"
+      - "8081:8081"
+    networks:
+      prodnetwork:
+        ipv4_address: 192.168.80.49
+    volumes:
+      - nexus-data:/nexus-data
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    deploy:
+      resources:
+        limits:
+          memory: 2G  # Adjust the memory limit as needed
+
+
+  jenkins:
+    hostname: jenkins
+    domainname: jenkins.local
+    build: ./jenkins
+    restart: always
+    ports:
+     # - "18080:8080"
+      - "8080:8080"
+    dns:
+      - 8.8.8.8
+    #  - 192.168.80.1
+      - 4.4.4.4
+    networks:
+      prodnetwork:
+        ipv4_address: 192.168.80.50
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - /docker-ci-tool-stack:/home/jenkins_data  # add this
+      - jenkins-data:/var/lib/jenkins/
+    depends_on:
+      - nexus
+      - sonar
+    environment:
+      - NEXUS_PORT=8081
+      - SONAR_PORT=9000
+      - SONAR_DB_PORT=5432
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    deploy:
+      resources:
+        limits:
+          memory: 1G  # Adjust the memory limit as needed
+
+  sonardb:
+    hostname: sonardb
+    domainname: sonardb.local
+    networks:
+      prodnetwork:
+        ipv4_address: 192.168.80.51
+    restart: always
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+    environment:
+     - POSTGRES_USER=sonar
+     - POSTGRES_PASSWORD=sonar
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  sonar:
+    hostname: sonar
+    domainname: sonar.local
+    image: sonarqube
+    restart: always
+    ports:
+    # - "19000:9000"
+     - "9000:9000"
+    # - "19092:9092"
+     - "9092:9092"
+    networks:
+      prodnetwork:
+        ipv4_address: 192.168.80.52
+    depends_on:
+      - sonardb
+    environment:
+     - SONARQUBE_JDBC_URL=jdbc:postgresql://sonardb:5432/sonar
+     - SONARQUBE_JDBC_USERNAME=sonar
+     - SONARQUBE_JDBC_PASSWORD=sonar
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    deploy:
+      resources:
+        limits:
+          memory: 2G  # Adjust the memory limit as needed
+
+
+  gitlab:
+    hostname: gitlab
+    domainname: gitlab.local
+    image: gitlab/gitlab-ce:latest
+    restart: always
+    networks:
+      prodnetwork:
+        ipv4_address: 192.168.80.53
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # external_url 'https://gitlab.example.com'
+        # Add any other gitlab.rb configuration here, each on its own line
+    ports:
+    #  - "10080:80"
+    #  - "10443:443"
+    #  - "10022:22"
+      - "8082:8082"
+      - "8443:443"
+      - "822:22"
+    volumes:
+      - /opt/gitlab/config:/etc/gitlab
+      - /opt/gitlab/logs:/var/log/gitlab
+      - /opt/gitlab/data:/var/opt/gitlab
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+### start block prometheus and grafanas
+#  prometheus:
+#    hostname: prometheus
+#    domainname: prometheus.local
+#    image: prom/prometheus
+#    container_name: prometheus
+#    restart: unless-stopped
+#    networks:
+#      - prodnetwork
+#    ports:
+#      - "9090:9090"
+#    volumes:
+#      - ./prometheus:/etc/prometheus
+#      - prom_data:/prometheus
+#    command:
+#      - '--config.file=/etc/prometheus/prometheus.yml'
+#      - '--storage.tsdb.path=/prometheus'
+#    depends_on:
+#        - jenkins
+#        - sonar
+#        - gitlab
+#        - nexus
+#        - grafana
+#        - sonardb
+#    extra_hosts:
+#      - host.docker.internal:host-gateway
+#
+#
+#  grafana:
+#    hostname: grafana
+#    domainname: grafana.local
+#    image: grafana/grafana
+#    container_name: grafana
+#    restart: unless-stopped
+#    networks:
+#      - prodnetwork
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#     # - /var/lib/grafana:/var/lib/grafana
+#     - ./grafana:/etc/grafana/provisioning/datasources
+#    environment:
+#      - GF_SECURITY_ADMIN_PASSWORD=admin
+#      - GF_SECURITY_ADMIN_USER=admin
+#    extra_hosts:
+#      - host.docker.internal:host-gateway
+##    depends_on:
+##      - prometheus
+#####  end block prometheus and grafana
+#  dns:
+#    image: phensley/docker-dns
+#    hostname: dns
+#    domainname: dns.local
+#    volumes:
+#      - /var/run/docker.sock:/docker.sock
+#    networks:
+#      prodnetwork:
+#        ipv4_address: 192.168.80.54

@@ -1,0 +1,13 @@
+sonar:2.17.2
+gitlab-plugin:1.8.0
+docker-compose-build-step:1.0
+ssh-credentials:334.v7732563deee1
+ssh-slaves:2.948.vb_8050d697fec
+gitlab-plugin:1.8.0
+github:1.38.0
+blueocean-dashboard:1.27.11
+blueocean-core-js:1.27.11
+blueocean-web:1.27.11
+pipeline-global-lib-nexus:0.3.2
+maven-artifact-choicelistprovider:1.17
+maven-plugin:3.23
