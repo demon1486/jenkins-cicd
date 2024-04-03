@@ -1,4 +1,4 @@
   steps:
   # running docker-compose
-  - name: 'docker/compose:2.25.0'
+  - name: 'docker/compose:latest'
     args: ['up', '-d']
