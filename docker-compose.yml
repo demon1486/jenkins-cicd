@@ -3,13 +3,13 @@ version: '3'
 networks:
   prodnetwork:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 192.168.80.0/24
-          ip_range: 192.168.80.48/28
-          gateway: 192.168.80.1
-    internal: true
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: 192.168.80.0/24
+#          ip_range: 192.168.80.48/28
+#          gateway: 192.168.80.1
+#    internal: true
 
 
 #networks:
@@ -57,7 +57,7 @@ services:
       - "8081:8081"
     networks:
       prodnetwork:
-        ipv4_address: 192.168.80.49
+#        ipv4_address: 192.168.80.49
     volumes:
       - nexus-data:/nexus-data
     extra_hosts:
@@ -76,17 +76,17 @@ services:
     ports:
      # - "18080:8080"
       - "8080:8080"
-    dns:
-      - 8.8.8.8
-    #  - 192.168.80.1
-      - 4.4.4.4
+#    dns:
+#      - 8.8.8.8
+#    #  - 192.168.80.1
+#      - 4.4.4.4
     networks:
       prodnetwork:
-        ipv4_address: 192.168.80.50
+#        ipv4_address: 192.168.80.50
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
-      - /docker-ci-tool-stack:/home/jenkins_data  # add this
+#      - /docker-ci-tool-stack:/home/jenkins_data  # add this
       - jenkins-data:/var/lib/jenkins/
     depends_on:
       - nexus
@@ -107,7 +107,7 @@ services:
     domainname: sonardb.local
     networks:
       prodnetwork:
-        ipv4_address: 192.168.80.51
+#        ipv4_address: 192.168.80.51
     restart: always
     image: postgres:9.6
     ports:
@@ -130,7 +130,7 @@ services:
      - "9092:9092"
     networks:
       prodnetwork:
-        ipv4_address: 192.168.80.52
+#        ipv4_address: 192.168.80.52
     depends_on:
       - sonardb
     environment:
@@ -221,11 +221,11 @@ services:
 ##      - prometheus
 #####  end block prometheus and grafana
 #  dns:
-#    image: phensley/docker-dns
-#    hostname: dns
-#    domainname: dns.local
-#    volumes:
-#      - /var/run/docker.sock:/docker.sock
-#    networks:
-#      prodnetwork:
+    image: phensley/docker-dns
+    hostname: dns
+    domainname: dns.local
+    volumes:
+      - /var/run/docker.sock:/docker.sock
+    networks:
+      prodnetwork:
 #        ipv4_address: 192.168.80.54
