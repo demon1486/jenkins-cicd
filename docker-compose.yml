@@ -50,7 +50,9 @@ services:
   nexus:
     hostname: nexus
     domainname: nexus.local
-    build: ./nexus
+    build:
+      context: ./nexus
+      dockerfile: Dockerfile
     restart: always
     ports:
      # - "18081:8081"
@@ -71,7 +73,9 @@ services:
   jenkins:
     hostname: jenkins
     domainname: jenkins.local
-    build: ./jenkins
+    build:
+      context: ./jenkins
+      dockerfile: Dockerfile
     restart: always
     ports:
      # - "18080:8080"
@@ -121,7 +125,10 @@ services:
   sonar:
     hostname: sonar
     domainname: sonar.local
-    image: sonarqube
+    build:
+      context: ./sonar
+      dockerfile: Dockerfile
+    #image: sonarqube
     restart: always
     ports:
     # - "19000:9000"
