@@ -1,15 +1,23 @@
 steps:
-  - name: gcr.io/cloud-builders/docker
+  # Running Docker Compose (if needed)
+  - name: 'docker/compose:latest'
+    args: [ 'up', '-d', '--build' ]
+
+  # Building Docker image
+  - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
       - '-t'
       - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
-      - .
-  - name: gcr.io/cloud-builders/docker
+      - '.'
+  # Pushing Docker image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
     args:
       - push
       - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
-  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+
+  # Deploying Docker image to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     args:
       - run
       - deploy
@@ -22,13 +30,9 @@ steps:
       - $_PLATFORM
     entrypoint: gcloud
 timeout: 1200s
+
 images:
   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
-  -
-  # Running Docker Compose (if needed)
-  - name: 'docker/compose:latest'
-    args: ['up', '-d', '--build']
 
 options:
   logging: GCS_ONLY
-
