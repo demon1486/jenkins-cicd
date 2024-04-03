@@ -125,10 +125,10 @@ services:
   sonar:
     hostname: sonar
     domainname: sonar.local
-    build:
-      context: ./sonar
-      dockerfile: Dockerfile
-    #image: sonarqube
+#    build:
+#      context: ./sonar
+#      dockerfile: Dockerfile
+    image: sonarqube
     restart: always
     ports:
     # - "19000:9000"
@@ -159,7 +159,7 @@ services:
     restart: always
     networks:
       prodnetwork:
-        ipv4_address: 192.168.80.53
+#        ipv4_address: 192.168.80.53
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         # external_url 'https://gitlab.example.com'
