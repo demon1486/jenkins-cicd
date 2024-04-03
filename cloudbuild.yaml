@@ -1,38 +1,77 @@
+#steps:
+#  # Running Docker Compose (if needed)
+#  - name: 'docker/compose:latest'
+#    args: [ 'up', '-d', '--build' ]
+#
+#  # Building Docker image
+#  - name: 'gcr.io/cloud-builders/docker'
+#    args:
+#      - build
+#      - '-t'
+#      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+#      - '.'
+#  # Pushing Docker image to Container Registry
+#  - name: 'gcr.io/cloud-builders/docker'
+#    args:
+#      - push
+#      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+#
+#  # Deploying Docker image to Google Cloud Run
+#  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#    args:
+#      - run
+#      - deploy
+#      - $_SERVICE_NAME
+#      - '--image'
+#      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+#      - '--region'
+#      - $_DEPLOY_REGION
+#      - '--platform'
+#      - $_PLATFORM
+#    entrypoint: gcloud
+#timeout: 1200s
+#
+#images:
+#  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+#
+#options:
+#  logging: GCS_ONLY
+
+
 steps:
-  # Running Docker Compose (if needed)
-  - name: 'docker/compose:latest'
-    args: [ 'up', '-d', '--build' ]
-
-  # Building Docker image
+  # Крок для збірки і розгортання контейнера "nexus"
   - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - '-t'
-      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
-      - '.'
-  # Pushing Docker image to Container Registry
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/nexus', './nexus']
   - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - push
-      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+    args: ['push', 'gcr.io/$PROJECT_ID/nexus']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['run', '-d', '-p', '8081:8081', 'gcr.io/$PROJECT_ID/nexus']
 
-  # Deploying Docker image to Google Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    args:
-      - run
-      - deploy
-      - $_SERVICE_NAME
-      - '--image'
-      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
-      - '--region'
-      - $_DEPLOY_REGION
-      - '--platform'
-      - $_PLATFORM
-    entrypoint: gcloud
-timeout: 1200s
+  # Крок для збірки і розгортання контейнера "jenkins"
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/jenkins', './jenkins']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/jenkins']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['run', '-d', '-p', '8080:8080', 'gcr.io/$PROJECT_ID/jenkins']
 
-images:
-  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+  # Крок для збірки і розгортання контейнера "sonar"
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/sonar', './sonar']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/sonar']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['run', '-d', '-p', '9000:9000', 'gcr.io/$PROJECT_ID/sonar']
 
+  # Крок для збірки і розгортання контейнера "gitlab"
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/gitlab', './gitlab']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/gitlab']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['run', '-d', '-p', '8082:8082', '-p', '8443:443', '-p', '822:22', 'gcr.io/$PROJECT_ID/gitlab']
+
+# Можливість налаштування інших параметрів Cloud Build
 options:
   logging: GCS_ONLY
+  machineType: 'N1_HIGHCPU_8'  # Налаштування розміру машини залежить від потреб вашого проекту
