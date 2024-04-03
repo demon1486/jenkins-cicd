@@ -2,7 +2,7 @@ version: '3'
 
 networks:
   prodnetwork:
-    driver: bridge
+ #   driver: bridge
     external: true
 #    ipam:
 #      driver: default
