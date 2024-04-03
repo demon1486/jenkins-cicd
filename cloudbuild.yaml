@@ -3,4 +3,4 @@
   - name: 'docker/compose:latest'
     args: ['up', '-d']
   options:
-    logging: NONE
+    logging: GCS_ONLY
