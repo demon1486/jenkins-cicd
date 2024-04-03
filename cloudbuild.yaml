@@ -1,13 +1,14 @@
 steps:
   # Building Docker images
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/eminent-range-419211/ci-cd:tag', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/eminent-range-419211/jenkins-cicd/image-name:tag', '.']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/your-project-id/ci-cd:tag']
+    args: ['push', 'us-central1-docker.pkg.dev/eminent-range-419211/jenkins-cicd/image-name:tag']
 
-  # Running Docker Compose
+  # Running Docker Compose (if needed)
   - name: 'docker/compose:latest'
     args: ['up', '-d']
 
 options:
   logging: GCS_ONLY
+
