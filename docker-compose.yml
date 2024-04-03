@@ -1,8 +1,8 @@
 version: '3'
 
-networks:
-  prodnetwork:
-    driver: host
+#networks:
+#  prodnetwork:
+#    driver: host
 
 
 #networks:
@@ -242,3 +242,7 @@ services:
     networks:
       prodnetwork:
 #        ipv4_address: 192.168.80.54
+
+networks:
+  prodnetwork:
+    external: true
