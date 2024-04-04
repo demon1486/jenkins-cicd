@@ -134,7 +134,7 @@ services:
 #    build:
 #      context: ./sonar
 #      dockerfile: Dockerfile
-    image: sonarqube
+    image: sonarqube:10.3.0-community
     restart: always
     ports:
     # - "19000:9000"
