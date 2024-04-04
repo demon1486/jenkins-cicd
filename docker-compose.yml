@@ -55,7 +55,7 @@ volumes:
 services:
   nexus:
     hostname: nexus
-    domainname: nexus.local
+#    domainname: nexus.local
     build:
       context: ./nexus
       dockerfile: Dockerfile
@@ -78,7 +78,7 @@ services:
 
   jenkins:
     hostname: jenkins
-    domainname: jenkins.local
+ #   domainname: jenkins.local
     build:
       context: ./jenkins
       dockerfile: Dockerfile
@@ -114,7 +114,7 @@ services:
 
   sonardb:
     hostname: sonardb
-    domainname: sonardb.local
+ #   domainname: sonardb.local
     networks:
       default:
 #        ipv4_address: 192.168.80.51
@@ -130,7 +130,7 @@ services:
 
   sonar:
     hostname: sonar
-    domainname: sonar.local
+ #   domainname: sonar.local
 #    build:
 #      context: ./sonar
 #      dockerfile: Dockerfile
@@ -160,8 +160,11 @@ services:
 
   gitlab:
     hostname: gitlab
-    domainname: gitlab.local
-    image: gitlab/gitlab-ce:latest
+  #  domainname: gitlab.local
+    build:
+      context: ./gitlab
+      dockerfile: Dockerfile
+  #  image: gitlab/gitlab-ce:latest
     restart: always
     networks:
       default:
@@ -233,16 +236,16 @@ services:
 ##    depends_on:
 ##      - prometheus
 #####  end block prometheus and grafana
-  dns:
-    image: phensley/docker-dns
-    hostname: dns
-    domainname: dns.local
-    volumes:
-      - /var/run/docker.sock:/docker.sock
-    networks:
-      default:
-#        ipv4_address: 192.168.80.54
-
-networks:
-  default:
-#    external: true
+#  dns:
+#    image: phensley/docker-dns
+#    hostname: dns
+#    domainname: dns.local
+#    volumes:
+#      - /var/run/docker.sock:/docker.sock
+#    networks:
+#      default:
+##        ipv4_address: 192.168.80.54
+#
+#networks:
+#  default:
+##    external: true
