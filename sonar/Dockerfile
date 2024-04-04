@@ -35,7 +35,7 @@ EXPOSE 9092
 RUN yum -y install unzip && yum clean all
 
 # Add SonarQube binaries from Nexus Repository
-ADD https://binaries.bintray.com/Distribution/sonarqube/sonarqube-${SONAR_VERSION}.zip $SONARQUBE_HOME/sonarqube-${SONAR_VERSION}.zip
+ADD https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-${SONAR_VERSION}.zip $SONARQUBE_HOME/sonarqube-${SONAR_VERSION}.zip
 
 # Unpack SonarQube Zip
 RUN set -x \

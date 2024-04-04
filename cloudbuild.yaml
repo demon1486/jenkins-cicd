@@ -57,7 +57,7 @@ steps:
 
   # Крок для збірки і розгортання контейнера "sonar"
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/sonar']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/sonar', './sonar']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/sonar']
   - name: 'gcr.io/cloud-builders/docker'
