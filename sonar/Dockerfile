@@ -11,7 +11,7 @@ ENV JAVA_OPTS "$JAVA_OPTS -Duser.country=DE -Duser.language=de -Duser.timezone=E
 # Set the JAVA_HOME variable to make it clear where Java is located
 ENV JAVA_HOME /usr/lib/jvm/java-1.8.0
 
-ENV SONAR_VERSION 5.6.3
+ENV SONAR_VERSION 10.1.0.73491
 ENV SONARQUBE_HOME /opt/sonarqube
 
 # Plugin Versions
@@ -35,7 +35,7 @@ EXPOSE 9092
 RUN yum -y install unzip && yum clean all
 
 # Add SonarQube binaries from Nexus Repository
-ADD https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-${SONAR_VERSION}.zip $SONARQUBE_HOME/sonarqube-${SONAR_VERSION}.zip
+ADD https://binaries.bintray.com/Distribution/sonarqube/sonarqube-${SONAR_VERSION}.zip $SONARQUBE_HOME/sonarqube-${SONAR_VERSION}.zip
 
 # Unpack SonarQube Zip
 RUN set -x \
